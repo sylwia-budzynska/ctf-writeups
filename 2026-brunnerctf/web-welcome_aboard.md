@@ -55,7 +55,8 @@ q=foobar
 `q=foobar` is 8 bytes.
 
 `Transfer-Encoding: chunked` specifies that the message body contains multiple chunks of data and some servers do not support it. From PortSwigger:
-> Each chunk consists of the chunk size in bytes (expressed in hexadecimal), followed by a newline, followed by the chunk contents. The message is terminated with a chunk of size zero. 
+> Each chunk consists of the chunk size in bytes (expressed in hexadecimal), followed by a newline, followed by the chunk contents. The message is terminated with a chunk of size zero.
+ 
 Let's take an example:
 ```http
 POST /search HTTP/1.1
@@ -79,11 +80,13 @@ During the CTF I tried several different types of request smuggling, but let's f
 
 In CL.TE the frontend uses Content-Length to terminate requests, and the backend ues Transfer-Encoding. In the payload, the Content-Length has to be the full length of the message body, so the whole request is forwarded to the backend. The length of the chunk is set to be 0, which terminates the request, so the backend processes the first chunk as if it had zero length, and the rest of the message body will be a new request.
 
-Working through PortSwigger labs, I noted it's important to get the content lengths right (which depend on the type of request smuggling attack we are doing), and the number of CRLF (`\r\n`). If the content length is too long, usually it will timeout the connection. At one point I noticed that I was getting the right payload with the right content lengths, but the second request was malformed and returned 400. We can enable making `\r\n` visible in Repeater.
+Working through PortSwigger labs, I noted it's important to get the content lengths right (which depend on the type of request smuggling attack we are doing), and the number of CRLF (`\r\n`). If the content length is too long, usually it will timeout the connection. At one point I noticed that I was getting the right payload with the right content length, but the second request was malformed and returned 400. 
+
+We can enable making `\r\n` visible in Repeater.
 
 <img src="./images/crlf-burp.png" max-height=400px max-width=400px>
 
-As for CRLF, I spent a _considerable amount of time_ with the wrong number of `\r\n`. The PortSwigger explanation for CL.TE show an example with the content (which will naturally be followed by `\r\n`), but no more than that.
+As for CRLF, I spent a _considerable amount of time_ with the wrong number of `\r\n`. The PortSwigger explanation for CL.TE shows an example with the content (which will naturally be followed by `\r\n`), but no more than that.
 
 However, this specific vulnerability had the chunk content plus its `\r\n` and another `\r\n`. I suppose its one of those ambigious behaviours, which depend on the server. It's a good lesson for the future.
 
