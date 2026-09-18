@@ -130,3 +130,5 @@ level1@jail-bash:~$ cat flag.txt 1>&2
 FLAG-U96l4k6m72a051GgE5EN0rA85499172K
 ```
 Stdout filedescriptor is `1`. `>` redirects standard output of `cat flag.txt` to standard error `&2`, so file descriptor 2. `&` means: treat the following number as a file descriptor, not as a filename.
+
+Also a good [intro to file descriptors](https://dev.to/sebastianmarines/understanding-linuxs-file-descriptors-a-deep-dive-into-21-and-redirection-4g5h).
